@@ -59,7 +59,7 @@ int main(int argc, char const *argv[])
             string command = input + " " + key + " " + value;
             strcpy(Command, command.c_str());
         }
-        else if (input == "value")
+        else if (input == "get")
         {
             string key;
             cout << "enter key : \n";
@@ -73,6 +73,13 @@ int main(int argc, char const *argv[])
         else if(input == "load")
         {
             strcpy(Command ,"load");
+        }
+        else if (input == "select")
+        {
+            string dbNumber;
+            cout << "enter DB number : \n";
+            cin >> dbNumber;
+            strcpy(Command, (input + " " + dbNumber).c_str());
         }
 
         send(sock, Command, strlen(Command), 0);

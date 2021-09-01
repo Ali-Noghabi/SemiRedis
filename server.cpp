@@ -8,10 +8,11 @@
 #include "iostream"
 using namespace std;
 #define PORT 8080
-//hello im ali
+
 void controller(string);
 void add(string , string);
-void value(string);
+void get(string);
+void select(int);
 void save();
 void load();
 int server_fd, new_socket; long valread;
@@ -70,10 +71,16 @@ void controller(string command)
     if(command == "add ali password")
     {
         add("ali" , "password");
-    }else if(command == "value ali")
+    }
+    else if(command == "get ali")
     {
-        value("ali");
-    }else if(command == "save")
+        get("ali");
+    }
+    else if(command == "select db1")
+    {
+        select(1);
+    }
+    else if(command == "save")
     {
         save();
     }else if(command == "load")
@@ -87,10 +94,16 @@ void add(string key , string value)
     char *callBack = "data added successfully";
     write(new_socket , callBack , strlen(callBack));
 }
-void value(string key)
+void get(string key)
 {
     cout << "value function\n";
     char *callBack = "value in map";
+    write(new_socket , callBack , strlen(callBack));
+}
+void select(int dbNumber)
+{
+    cout << "select function\n";
+    char *callBack = "database selected successfully";
     write(new_socket , callBack , strlen(callBack));
 }
 void save()
