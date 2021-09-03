@@ -26,10 +26,12 @@ mutex myMutex;
 
 int main(int argc, char const *argv[])
 {
+    map<string ,string> db1;
+    map<string ,string> db2;
+    container.push_back(db1);
+    container.push_back(db2);
     struct sockaddr_in address;
     int addrlen = sizeof(address);
-    
-    
     
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
