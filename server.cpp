@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <map>
+#include <vector>
+#include <thread>
+#include <mutex>
 #include "iostream"
 using namespace std;
 #define PORT 8080
@@ -16,6 +20,10 @@ void select(int);
 void save();
 void load();
 int server_fd, new_socket; long valread;
+int dbNumber;
+vector <map<string,string>>container;
+mutex myMutex;
+
 int main(int argc, char const *argv[])
 {
     struct sockaddr_in address;
@@ -70,7 +78,7 @@ void controller(string command)
 {
     if(command == "add ali password")
     {
-        add("ali" , "password");
+        thread t( add ,"ali" , "password" );
     }
     else if(command == "get ali")
     {
@@ -90,19 +98,32 @@ void controller(string command)
 }
 void add(string key , string value)
 {
-    cout << "add function\n";
-    char *callBack = "data added successfully";
+    lock_guard<std::mutex> guard(myMutex);
+    char *callBack;
+    if(container[dbNumber-1].find(key)!=container[dbNumber-1].end())
+    {
+        container[dbNumber-1].insert(pair<string,string>(key , value));
+        callBack = "data added successfully";
+    }
+    else
+        callBack = "key is already exist";
     write(new_socket , callBack , strlen(callBack));
 }
 void get(string key)
 {
-    cout << "value function\n";
-    char *callBack = "value in map";
+    lock_guard<std::mutex> guard(myMutex);
+    auto it = container[dbNumber-1].find(key);
+    string s;
+    if(it != container[dbNumber-1].end())
+        s = it->second;
+    else
+        s = " this key doesnt exist \n ";
+    char *callBack = &s[0];
     write(new_socket , callBack , strlen(callBack));
 }
-void select(int dbNumber)
+void select(int _dbNumber)
 {
-    cout << "select function\n";
+    dbNumber = _dbNumber;
     char *callBack = "database selected successfully";
     write(new_socket , callBack , strlen(callBack));
 }
