@@ -3,4 +3,4 @@ project(semi_redis)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(semi_redis main.cpp)
+add_executable(semi_redis server.cpp)

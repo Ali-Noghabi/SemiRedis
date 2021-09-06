@@ -26,6 +26,12 @@ mutex myMutex;
 
 int main(int argc, char const *argv[])
 {
+
+    map<string ,string> db1;
+    map<string ,string> db2;
+    container.push_back(db1);
+    container.push_back(db2);
+
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     
@@ -76,42 +82,96 @@ int main(int argc, char const *argv[])
 }
 void controller(string command)
 {
-    if(command == "add ali password")
-    {
-        thread t( add ,"ali" , "password" );
+    int start = 0;
+    int count = 0;
+    string fstr,mstr,lstr;
+    string s = command;
+    string spc = " ";
+    int end = s.find(spc);
+    while (end != -1){
+        if(count == 0){
+            fstr = s.substr(start,end - start);
+            start = end + spc.size();
+            end = s.find(spc, start);
+            count++;
+        }
+        else if(count == 1){
+            mstr = s.substr(start,end - start);
+            start = end + spc.size();
+            end = s.find(spc, start);
+            count++;   
+        }
+        
     }
-    else if(command == "get ali")
-    {
-        get("ali");
+    if(count == 0){
+        fstr = s.substr(start,end - start);
     }
-    else if(command == "select db1")
-    {
-        select(1);
+    if(count == 1){
+        mstr = s.substr(start,end - start);
     }
-    else if(command == "save")
+    if(count == 2){
+        lstr = s.substr(start,end - start);
+    }
+    
+    if(fstr == "add" || fstr == "Add")
+    {
+        add(mstr , lstr);
+        // thread t( add ,mstr , lstr );
+        // t.join();
+    }
+    else if(fstr == "get"|| fstr == "Get")
+    {
+        get(mstr);
+        // thread t1(get , mstr);
+        // t1.join();
+    }
+    else if(fstr == "select")
+    {
+        if(mstr == "db1"||mstr == "DB1"){
+            select(1);
+            // thread t2 (select , 1);
+            // t2.join();
+        }
+        if(mstr == "db2"||mstr == "DB2"){
+            select(2);
+            // thread t3 (select , 1);
+            // t3.join();
+        }
+        
+    }
+    else if(fstr == "save")
     {
         save();
-    }else if(command == "load")
+    } 
+    else if(fstr == "load")
     {
         load();
+    }
+    else{
+        cout << "command is not valid\n";
     }
 }
 void add(string key , string value)
 {
-    lock_guard<std::mutex> guard(myMutex);
+    // lock_guard<std::mutex> guard(myMutex);
+    cout << "test2\n";
     char *callBack;
-    if(container[dbNumber-1].find(key)!=container[dbNumber-1].end())
+    if(container[dbNumber-1].find(key)==container[dbNumber-1].end())
     {
+        cout << "test3\n";
         container[dbNumber-1].insert(pair<string,string>(key , value));
         callBack = "data added successfully";
     }
-    else
+    else{
+        cout << "test4\n";
         callBack = "key is already exist";
+        }
     write(new_socket , callBack , strlen(callBack));
+    cout << "test3\n";
 }
 void get(string key)
 {
-    lock_guard<std::mutex> guard(myMutex);
+    // lock_guard<std::mutex> guard(myMutex);
     auto it = container[dbNumber-1].find(key);
     string s;
     if(it != container[dbNumber-1].end())
@@ -123,6 +183,7 @@ void get(string key)
 }
 void select(int _dbNumber)
 {
+    // lock_guard<std::mutex> guard(myMutex);
     dbNumber = _dbNumber;
     char *callBack = "database selected successfully";
     write(new_socket , callBack , strlen(callBack));
